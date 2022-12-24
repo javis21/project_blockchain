@@ -46,4 +46,73 @@ contract mock_agregator is AggregatorV2V3Interface {
 
 
 
+
+    function updateRoundData(
+        uint80 _roundId,
+        int256 _answer,
+        uint256 _timestamp,
+        uint256 _startedAt
+    ) public {
+        latestRound = _roundId;
+        latestAnswer = _answer;
+        latestTimestamp = _timestamp;
+        getAnswer[latestRound] = _answer;
+        getTimestamp[latestRound] = _timestamp;
+        getStartedAt[latestRound] = _startedAt;
+    }
+
+
+
+
+
+    function getRoundData(uint80 _roundId)
+        external
+        view
+        override
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        )
+    {
+
+
+
+        return (
+            _roundId,
+            getAnswer[_roundId],
+            getStartedAt[_roundId],
+            getTimestamp[_roundId],
+            _roundId
+        );
+    }
+
+
+
+    function latestRoundData()
+        external
+        view
+        override
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        )
+    {
+        return (
+            uint80(latestRound),
+            getAnswer[latestRound],
+            getStartedAt[latestRound],
+            getTimestamp[latestRound],
+            uint80(latestRound)
+        );
+    }
+
+    function description() external view override returns (string memory) {
+        return "v0.6/tests/mock_agregator.sol";
+    }
 }
