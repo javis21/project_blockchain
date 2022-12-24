@@ -48,4 +48,53 @@ contract SmartFund {
 
 
 
+    function getVersion() public view returns (uint256) {
+        return pricing.version();
+    }
+
+
+
+    function getPrice() public view returns (uint256) {
+        (, int256 answer, , , ) = pricing.latestRoundData();
+        return uint256(answer * 10000000000);
+    }
+
+
+
+    function getConversionRate(uint256 ethAmount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 Price = getPrice();
+        uint256 ethAmountInUsd = (ethAmount * Price)/ 1000000000000000000;
+        return ethAmountInUsd;
+    }
+
+
+    function getEntranceFee() public view returns (uint256) {
+        //minimum USD
+        uint256 minimun = 1 * 10**18;
+        uint256 price = getPrice();
+        uint256 precision = 1 * 10**18;
+        return (minimun * precision) / price;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function withdrow() public payable onlyOwner {
+        msg.sender.transfer(address(this).balance);
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < funders.length;
+            funderIndex++
+        ) {
+            address funder = funders[funderIndex];
+            addressToAmountFunded[funder] = 0;
+        }
+        funders = new address[](0);
+    }
 }
